@@ -2,150 +2,23 @@
 
 {% block content %}
 
-	
-	<a href="{% url objecthandles.views.donate %}"><img src="/static/donate.png" class="topDonate"></a>
-	
-	<h1>ObjectHandles Examples</h1>
+<h1>What is it?</h1>	
+A very common UI element found in many applications are those little square handles around an on-screen object that allow you to move &amp; resize it. 
 
-	<div class="intro">
-		<h2>What is ObjectHandles</h2>
-		<p>
-			ObjectHandles is a free Actionscript based library that allows a user to move and resize items on the screen.  You can get it, for free, from it's main website at<br/> <a href="/">http://www.objecthandles.com/</a>
-		</p>
-		<h2>What is this web page?</h2>
-		<p>
-			This page is about a set of 7 example applications that will show you how to use ObjectHandles to do some common things.
-			While ObjectHandles is free, these examples aren't.  I created them as an experiment in one way of funding an
-			open source project.
-		</p>
-		<h2>So what's in these examples?</h2>
-		<p>
-			See the grid below.  It lists what's in each example.  To the right is a video showing what the example does,
-			and a link so you can run the example to actually try it out.
-		</p>
-	</div>
-	
-	<table class="exampleGrid">
-		
-			
-			<tr class="exampleGridTrh"><td>Example Name</td><td>Description</td><td>Links</td></tr>
-			<tr class="exampleGridTr1"><td>BasicExample</td><td>This is a basic example that shows how to use ObjectHandles in an MVC way
-								Many of the other examples build off of this one, so it's important to 
-								understand how it works first.  A good place to look first is 
-								BasicExample.mxml</td>
-								<td>
-									<ul>
-										
-										<li><a class='video' href="/youtube/9hwAzVRIb_E" title="ObjectHandles Demo">Getting Started (Video)</a></li>										
-										<li><a class='video' href="/youtube/Fxv3_P29BNQ" title="ObjectHandles Demo">Demonstration (Video)</a></li>
-										<li><a class='tryExample' href="/static/BasicExample/BasicExample.html" title="Example Demonstration">Try Example Now</a></li>
-									</ul>									
-									
-								</td>
-								</tr>
-
-			<tr class="exampleGridTr2"><td>DragNDropExample</td><td>			This takes the BasicExample, removes the "add square" button and lets the
-								user add squares by dragging and dropping them onto the canvas.</td>
-								<td>
-									<ul>
-										<li><a class='video' href="/youtube/2XLBRK8E87U" title="ObjectHandles Demo">Demonstration (Video)</a></li>
-										<li><a class='tryExample' href="/static/DragNDropExample/DragNDropExample.html" title="Example Demonstration">Try Example Now</a></li>
-									</ul>									
-								</td></tr>
-
-
-			<tr class="exampleGridTr1"><td>MultiObjectExample</td><td>			Now that we have the ability to drag and drop items, lets extend that to
-								support different types of objects to be dropped.</td>
-								<td>
-									<ul>
-										<li><a class='video' href="/youtube/Sz3jMYfiMCM" title="ObjectHandles Demo">Demonstration (Video)</a></li>										
-										<li><a class='tryExample' href="/static/MultiObjectExample/MultiObjectExample.html" title="Example Demonstration">Try Example Now</a></li>
-									</ul>																		
-								</td></tr>
-
-			<tr class="exampleGridTr2"><td>TextObjectExample</td><td>			Lets take a look at two different ways to handle text.  The first gives 
-								you a resizeable text area.  The second allows you to scale the text.
-								This also shows how to use custom handles for some of your components.
-								<td>
-									<ul>
-										<li><a class='video' href="/youtube/XTZanbuF4kE" title="ObjectHandles Demo">Demonstration (Video)</a></li>																				
-										<li><a class='tryExample' href="/static/TextObjectExample/TextObjectExample.html" title="Example Demonstration">Try Example Now</a></li>
-									</ul>																		
-								</td></tr>
-								
-
-			<tr class="exampleGridTr1"><td>ConstraintsExample</td><td>			Takes the previous TextObjectExample and explores some constraints on
-								objects including keeping things on screen, setting min or max sizes,
-								keeping a constant aspect ratio, and a custom written constraint to
-								force the text to be rotated in 30 degree increments.</td>
-								<td>
-									<ul>
-										<li><a class='video' href="/youtube/my7DrzYp4p0" title="ObjectHandles Demo">Demonstration (Video)</a></li>										
-										<li><a class='video' href="/youtube/A-70oqCjxvE" title="ObjectHandles Constraint types">Constraints Video</a></li>
-										<li><a class='tryExample' href="/static/ConstraintsExample/ConstraintsExample.html" title="ObjectHandles Constraints">Try Example Now</a></li>
-									</ul>
-									
-								</td></tr>
-
-			<tr class="exampleGridTr2"><td>DecoratorExample</td><td>			Add some decorators to our example application.  We'll add lines that
-								get drawn when items are aligned, and we'll add the ability for the
-								user to link multiple items together.
-								<td>
-									<ul>
-										<li><a class='video' href="/youtube/e8bVhjVjxAY" title="ObjectHandles Demo">Demonstration (Video)</a></li>																				
-										<li><a class='tryExample' href="/static/DecoratorExample/DecoratorExample.html" title="Example Demonstration">Try Example Now</a></li>
-									</ul>																		
-								</td></tr>				
-												
-			<tr class="exampleGridTr1"><td>FinishingTouches</td><td>			Now lets add some finishing touches to our application including:
-									a) A toolbar that lets us set the color of objects
-									b) Change the delete button to actually delete the selected items
-									c) Clear the selection when the user clicks on the background
-									<td>
-										<ul>
- 										  <li><a class='video' href="/youtube/QW-Gko6BJ5c" title="ObjectHandles Demo">Demonstration (Video)</a></li>																					
-											<li><a class='tryExample' href="/static/FinishingTouches/FinishingTouches.html" title="Example Demonstration">Try Example Now</a></li>
-										</ul>																		
-									</td></tr>									
-	</table>
-	
-	<div class="intro">
-	<h2>Not free?  Why should I pay?</h2>
-	<p>
-		Your support helps further the development of the core ObjectHandles library.  While creating these examples I was able to
-		implement several features, fix a handful of bugs, and improve general performance of the core (free) library for everyone
-		to enjoy.  
-		<br/><br/>
-		Here are some future examples that your donation could help fund (If you donate now, you do have access to all future updates)
-	</p>
+<h1>Live Example</h1>
+<div id="example">
+ 
 </div>
-	<table class="exampleGrid">
-		
-			
-			<tr class="exampleGridTrh"><td>Example Name</td><td>Description</td><td>Status</td></tr>
-			<tr class="exampleGridTr1"><td>Flex4Example</td><td>Take the "FinishingTouches" example above and to it entirely in Flex 4</td>
-								<td>Not yet developed.</td></tr>
-			<tr class="exampleGridTr2"><td>Flash Example</td><td>Show how to use ObjectHandles in a Flash CS4 (CS5?) environment without Flex</td>
-								<td>Not yet developed.</td></tr>
-			<tr class="exampleGridTr1"><td>What else?</td><td>I'm always happy to hear suggestions for future examples.</td>
-								<td></td></tr>
-							
-	</table>
-	<div class="intro">	
-	<h2>Ok, how much?</h2>
-	<p>
-		You tell me.  It's a minimum of $15, but I let you name your price above that.  Give what you think ObjectHandles is worth
-		to you.
-		
-		These examples represent dozens of hours of work. If you were to hire somebody on a contracting basis it would easily have cost you $1000 for them.
-		The core library represents far more labor than that.
-	</p>
-	<h2>Where do I get it?</h2>
-	<p>
-		Click the Donate Now button. <br/><br/>
-		
-		<a href="{% url objecthandles.views.donate %}"><img src="/static/donate.png" ></a>
-	</p>
-	</div>
+<br/>Want some more examples?  Click the "Try Example Now" links here on the <a href="{% url objecthandles.views.examples %}">demo/tutorial page</a><br/>
+
+<h1>Demos / Tutorials</h1>
+Need some more help?  <br/><br/>Consider buying the <a href="{% url objecthandles.views.examples %}">demo applications</a> that show you how to use ObjectHandles!
+
+
+<script type="text/javascript" charset="utf-8">
+  swfobject.embedSWF("/static/ObjectHandles2Example.swf", "example", "730", "520", "10.0.0");
+  
+</script>
 
 {% endblock %}
+

@@ -11,8 +11,21 @@ from django.contrib.auth.decorators import login_required
 from google.appengine.api import urlfetch
 from objecthandles.models import *
 
+def license(request):
+    return render_to_response( request,'objecthandles/license.html' );
+    
+def examples(request):
+  return render_to_response( request,'objecthandles/examples.html' );
+
 def home(request):
   return render_to_response( request,'objecthandles/home.html' );
+
+def consulting(request):
+  return render_to_response( request,'objecthandles/consulting.html' );
+
+@login_required  
+def purchaseExamples(request):  
+  return render_to_response( request,'objecthandles/purchaseExamples.html');
 
 @login_required  
 def donate(request):
@@ -34,25 +47,35 @@ def donate(request):
 def googleDonate(request):
 
   amount = int( 100 * float( request.POST.get('amount','0') ));
-   
-  if amount < 1500:
-    amount = 1500
   
   key = str(random.randint(10000,50000))
+  
+  if request.POST.get('donateOnly','0') == "true":
+   digicontent = ""
+   name_desc =   "&item_name_1=ObjectHandles%20Donation" + \
+                 "&item_description_1=Help%20to%20improve%20ObjectHandles%20by%20donating" ;
+
+  else:
+    if amount < 2000:
+      amount = 2000
+    name_desc =   "&item_name_1=ObjectHandles%20Example%20Applications" + \
+                  "&item_description_1=Help%20to%20improve%20ObjectHandles%20by%20donating" ;
+    digicontent =   "&shopping-cart.items.item-1.digital-content.display-disposition=OPTIMISTIC" + \
+                    "&shopping-cart.items.item-1.digital-content.description=Please%20go%20to%20&lt;a%20href=&quot;http://www.objecthandles.com/download?key=" + key + "&quot;&gt;the%20download%20page&lt;/a&gt;" + \
+                    "&shopping-cart.items.item-1.digital-content.url=http://www.objecthandles.com/download?key=" + key ;
+  
+  
   
   request.user.pending_key = key
   request.user.pending_amount = amount
   request.user.put()
   
   request_body="_type=checkout" + \
-              "&item_name_1=ObjectHandles%20Example%20Applications" + \
-              "&item_description_1=Help%20to%20improve%20ObjectHandles%20by%20donating" + \
+              name_desc + \
               "&item_price_1=" + "%0.2f" % (amount/100) + \
               "&item_currency_1=USD" + \
               "&item_quantity_1=1" + \
-              "&shopping-cart.items.item-1.digital-content.display-disposition=OPTIMISTIC" + \
-              "&shopping-cart.items.item-1.digital-content.description=Please%20go%20to%20&lt;a%20href=&quot;http://object-handles-examples.appspot.com/download?key=" + key + "&quot;&gt;the%20download%20page&lt;/a&gt;" + \
-              "&shopping-cart.items.item-1.digital-content.url=http://object-handles-examples.appspot.com/download?key=" + key + \
+              digicontent + \
               "&_charset_"
 
   key = "Basic " + base64.b64encode("334861116685487:lJ9Ju7frsxiVRNyey89zdA")
