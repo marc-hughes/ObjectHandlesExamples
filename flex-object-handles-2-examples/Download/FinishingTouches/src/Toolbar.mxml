@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" height="50" width="528" borderStyle="inset" backgroundColor="#E8E8E8">
+
+
+<!--
+  Step 4
+  
+  Create a toolbar to edit the color of an item.
+  
+  A toolbar needs to do a few things
+    1) When an item is selected, it needs to set the color of the color picker to the color of that item.
+    2) When no items are selected, it needs to disable the color picker
+    3) When a user selects a new color, it needs to update the color of that item.
+
+
+  In a real app, you'd probably have a lot more properties to edit for each component than color.
+  
+  When you're through here, head back to FinishingTouches.mxml for step 5.
+-->
+
+<mx:Script>
+	<![CDATA[
+		import com.roguedevelopment.objecthandles.SelectionEvent;
+		import com.roguedevelopment.objecthandles.ObjectHandlesSelectionManager;
+		public var _selectionManager:ObjectHandlesSelectionManager;
+		public var controller:Controller;
+		public function set selectionManager( man:ObjectHandlesSelectionManager ) :void
+		{
+			_selectionManager = man;
+			_selectionManager.addEventListener(SelectionEvent.ADDED_TO_SELECTION, onSelectionChanged );
+			_selectionManager.addEventListener(SelectionEvent.REMOVED_FROM_SELECTION, onSelectionChanged );
+			_selectionManager.addEventListener(SelectionEvent.SELECTED, onSelectionChanged );
+			_selectionManager.addEventListener(SelectionEvent.SELECTION_CLEARED, onSelectionChanged );
+		}
+		
+		
+		// Listen for the selection to change so we can update our color picker
+		protected function onSelectionChanged(event:SelectionEvent):void
+		{			
+			if( _selectionManager.currentlySelected.length != 1)  
+			{
+				// If there's not exactly one item selected, we're not doing anything with it.  
+				// In a real app you'd probably want to handle multiple selection more gracefully.
+				
+				colorPicker.enabled = false;						
+				return;
+			}
+			
+			var obj:RectangleModel = _selectionManager.currentlySelected[0] as RectangleModel;
+			colorPicker.selectedColor = obj.backgroundColor;
+			colorPicker.enabled = true;
+			
+			
+			// If you had a more complex app with different toolbars depending on what is selected,
+			// you could check the type of _selectionManager.currentlySelected[0] and swap the toolbar accordingly.
+			
+		}
+		
+		// Listen for the user to select a new color
+		protected function onColorChanged(event:Event):void
+		{
+			if( _selectionManager.currentlySelected.length != 1) return;
+			
+			var obj:RectangleModel = _selectionManager.currentlySelected[0] as RectangleModel;
+			obj.backgroundColor = colorPicker.selectedColor;						
+		}
+	]]>
+</mx:Script>
+	<mx:Label x="10" y="16" text="Color:"/>
+	<mx:ColorPicker enabled="false" x="86" y="2" width="44" height="44" change="onColorChanged(event)" id="colorPicker"/>
+	
+</mx:Canvas>

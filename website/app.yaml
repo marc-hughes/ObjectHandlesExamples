@@ -1,0 +1,22 @@
+﻿application: object-handles-examples
+version: 2
+runtime: python
+api_version: 1
+
+default_expiration: '3650d'
+
+handlers:
+- url: /media
+  static_dir: _generated_media
+
+- url: /static
+  static_dir: objecthandles/static
+
+- url: /favicon.ico
+  static_files: objecthandles/static/favicon.ico
+  upload: objecthandles/static/favicon.ico
+      
+- url: /.*
+  script: common/appenginepatch/main.py
+
+

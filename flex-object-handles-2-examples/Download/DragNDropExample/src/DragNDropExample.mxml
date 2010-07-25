@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This example is meant to show how to use drag and drop to create items that are then managed
+  by an ObjectHandles instance.
+  
+  On the left is a preview of a rectangle.  If you drag and drop it onto the white canvas, a new
+  item should be created there which then allows you to move it around.
+  
+  Note, we don't use ObjectHandles for drag and drop operations, it's not well suited for that.
+
+-->
+
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+				layout="absolute" 
+				creationComplete="init()">
+				
+	<mx:Script>
+		<![CDATA[
+			import mx.graphics.ImageSnapshot;
+			import mx.events.DragEvent;
+			import mx.core.DragSource;
+			import mx.managers.DragManager;
+			import mx.events.CollectionEvent;
+			import mx.events.CollectionEventKind;
+			import com.roguedevelopment.objecthandles.ObjectHandles;
+			
+			protected var dataModel:DataModel = new DataModel();
+			protected var controller:Controller = new Controller( dataModel );
+			protected var objectHandles:ObjectHandles;
+			
+			
+			
+			/**
+			 * Starts the drag operation when the mouse is down on our preview component
+			 * on the left.
+			 **/
+			protected function beginDrag(event:MouseEvent) : void
+			{
+				var source:DragSource = new DragSource();
+				source.addData("square","shape"); 
+				source.addData(new Point(event.localX,event.localY), "offset");
+				DragManager.doDrag(rectangleSource,source,event ); 
+				
+			}
+			
+			/**
+			 * Allow the object to be dropped onto the mainCanvas object.
+			 * 
+			 * Note, we should probably check the event.dragSource to make sure we
+			 * can handle this type of object.
+			 **/
+			protected function onDragEnter(event:DragEvent):void
+			{
+				
+				DragManager.acceptDragDrop( mainCanvas );						
+			}
+
+			/**
+			 * Actually drops the object onto the mainCanvas.
+			 **/
+			protected function onDragDrop(event:DragEvent):void
+			{
+				var offset:Point = event.dragSource.dataForFormat("offset") as Point; // First, grab the offset the mouse was on the preview
+				controller.addSquare( event.localX - offset.x, event.localY - offset.y, 100 , 25 ); // Then actually create the new rectangle taking into account that offset.
+			}
+			
+			/**
+			 * Call the controller and tell it to delete a square from the model.
+			 * 
+			 * In an "ideal" world there would probably be a mediator between the
+			 * view and the controller that listens for events and passes them
+			 * onto the controller, but lets keep this simple for now.
+			 * 
+			 * Note, we're not trying to delete the currently selected square or
+			 * anything like that.
+			 **/
+			protected function deleteSquare():void
+			{
+				controller.deleteLastSquare();
+			}			
+			
+			/**
+			 * Called from the creationComplete event (see the root MXML tag)
+			 * 
+			 * This method sets up our ObjectHandles instance and adds a listener to our data model.
+			 **/
+			protected function init() : void
+			{
+				/*
+				  Since this is a View object, it should be watching the data model and updating itself
+				  when it changed.  This MXML file is tasked with creating or removing display objects when
+				  they're added or removed from the data model.  To do that, we'll create an event listener
+				  on dataModel.rectangles
+				*/
+				dataModel.rectangles.addEventListener(CollectionEvent.COLLECTION_CHANGE, onRectanglesChanged );
+				
+				/*
+				  Create the ObjectHandles instance.  In terms of MVC, ObjectHandles is part of the Controller
+				  It will listen for events on the view, and make changes to the data model. 
+				*/
+				objectHandles = new ObjectHandles( mainCanvas );
+			}
+			
+			protected function onRectanglesChanged( event:CollectionEvent ) : void
+			{
+				switch( event.kind  )
+				{
+					case CollectionEventKind.ADD:	addRectangles( event.items );
+													break;				
+					case CollectionEventKind.REMOVE: removeRectangles(event.items);
+												     break;
+					default:				
+						/* For this simple application, we're only going to deal with adding and removing rectangles,
+						   later examples will get more involved. */
+				}
+			}
+			
+			/**
+			 * Removes rectangles from the display. 
+			 * 
+			 * This gets called when the model is changes and thigns are removed
+			 * from dataModel.rectangles.
+			 **/
+			protected function removeRectangles( rectangles:Array ) : void
+			{
+				for each ( var rect:RectangleModel in rectangles ) // the data models are passed in, so loop over them
+				{
+					// First, get the view object that corresponds to that data model
+					var viewObject:IEventDispatcher = objectHandles.getDisplayForModel( rect );
+					
+					// Unregister from ObjectHandles so it doesn't try to modify it anymore, this
+					// will also remove event listeners.
+					objectHandles.unregisterComponent( viewObject );
+					
+					// Finally, actually remove it from the view.
+					mainCanvas.removeChild( viewObject as DisplayObject );
+					
+				}
+			}
+			
+			
+			
+			/**
+			 * adds rectangles to the display. 
+			 * 
+			 * This gets called when the model is changes and thigns are added
+			 * to dataModel.rectangles.
+			 **/			
+			protected function addRectangles( rectangles:Array ) : void
+			{
+				for each ( var rect:RectangleModel in rectangles )
+				{
+					// Here's how to do it with an Actionscript object:
+					// var newView:RectangleView = new RectangleView( rect );
+					// objectHandles.registerComponent( rect, newView );
+					// mainCanvas.addChild( newView );
+					
+					// Here's how to do it with an MXML object:
+					var newView:RectangleView2 = new RectangleView2();
+					newView.dataModel = rect;
+					objectHandles.registerComponent( rect, newView );
+					mainCanvas.addChild( newView );
+					
+				}
+			}
+			
+			
+		]]>
+	</mx:Script>
+	
+	
+	<mx:Canvas left="109" 
+			right="0" top="0" 
+			bottom="0" 
+			backgroundColor="#FFFFFF" 
+			id="mainCanvas"
+			dragEnter="onDragEnter(event)"
+			dragDrop="onDragDrop(event);"
+			/>
+	
+	<mx:Image source="rectangle.png" top="10" left="5" mouseDown="beginDrag(event)" id="rectangleSource" />
+	
+	<mx:Button x="10" bottom="10" label="Del Square" width="91" click="deleteSquare()"/>
+	
+</mx:Application>

@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This example extends the previous DragDropExample and makes it possible to drag and drop different
+  types of items onto the canvas.
+
+  We add a circle/oval object that behaves a lot like our previous rectangle.  And we also add a new type
+  of object capable of displaying an image.  We then allow you to add two different types of car images
+  to the canvas that use this same component.
+  
+  Look below for the comments starting with "Step 1", "Step 2", etc. to see what we changed.  
+
+-->
+
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+				layout="absolute" 
+				creationComplete="init()">
+				
+	<mx:Script>
+		<![CDATA[
+			import mx.core.IUIComponent;
+			import mx.graphics.ImageSnapshot;
+			import mx.events.DragEvent;
+			import mx.core.DragSource;
+			import mx.managers.DragManager;
+			import mx.events.CollectionEvent;
+			import mx.events.CollectionEventKind;
+			import com.roguedevelopment.objecthandles.ObjectHandles;
+			
+			protected var dataModel:DataModel = new DataModel();
+			protected var controller:Controller = new Controller( dataModel );
+			protected var objectHandles:ObjectHandles;
+			
+			
+			
+			/**
+			 * Starts the drag operation when the mouse is down on our preview component
+			 * on the left.
+			 * 
+			 * Step 2
+			 * Modify beginDrag to be aware of what it is dragging.
+			 **/
+			protected function beginDrag(event:MouseEvent, shapeType:String) : void
+			{
+				var sourceImage:Object = event.target;
+				if(! sourceImage ) return;
+				
+				var source:DragSource = new DragSource();
+				
+				switch( shapeType )
+				{
+					case "rectangle":					
+						source.addData("rectangle","shape"); 
+						source.addData(new Point(event.localX,event.localY), "offset");
+						DragManager.doDrag(rectangleSource,source,event );
+						break;
+					case "circle":					
+						source.addData("circle","shape"); 
+						source.addData(new Point(event.localX,event.localY), "offset");
+						DragManager.doDrag(circleSource,source,event );
+						break;
+					case "car1":					
+						source.addData("image","shape"); 
+						source.addData("car1.png","sourceImage");
+						source.addData(new Point(event.localX,event.localY), "offset");
+						DragManager.doDrag(car1Source,source,event );
+						break;
+					case "car2":					
+						source.addData("image","shape");
+						source.addData("car2.png","sourceImage"); 
+						source.addData(new Point(event.localX,event.localY), "offset");
+						DragManager.doDrag(car2Source,source,event );
+						break;
+				}
+			}
+			
+			/**
+			 * Allow the object to be dropped onto the mainCanvas object.
+			 * 
+			 * Note, we should probably check the event.dragSource to make sure we
+			 * can handle this type of object.
+			 **/
+			protected function onDragEnter(event:DragEvent):void
+			{
+				
+				DragManager.acceptDragDrop( mainCanvas );						
+			}
+
+			/**
+			 * Actually drops the object onto the mainCanvas.
+			 * 
+			 * Step 3
+			 *  When something is dropped on the canvas, figure out what shape type it is, and call the appropriate
+			 *  controller method to add it.  For step 4, see Controller.as
+			 **/
+			protected function onDragDrop(event:DragEvent):void
+			{
+				
+				var offset:Point = event.dragSource.dataForFormat("offset") as Point; // First, grab the offset the mouse was on the preview
+				var shapeType:String = event.dragSource.dataForFormat("shape") as String;
+				
+				switch( shapeType )
+				{
+					case "rectangle":							
+						controller.addSquare( event.localX - offset.x, event.localY - offset.y, 100 , 25 ); // Then actually create the new rectangle taking into account that offset.
+						break;
+					case "circle":
+						controller.addCircle(event.localX - offset.x, event.localY - offset.y, 100 , 25 );
+						break;
+					case "image":
+						var sourceImage:String = event.dragSource.dataForFormat("sourceImage") as String;
+						controller.addImage(event.localX - offset.x, event.localY - offset.y, 100 , 25 , sourceImage );
+						break;
+				}
+			}
+			
+			/**
+			 * Call the controller and tell it to delete a square from the model.
+			 * 
+			 * In an "ideal" world there would probably be a mediator between the
+			 * view and the controller that listens for events and passes them
+			 * onto the controller, but lets keep this simple for now.
+			 * 
+			 * Note, we're not trying to delete the currently selected square or
+			 * anything like that.
+			 **/
+			protected function deleteSquare():void
+			{
+				controller.deleteLastSquare();
+			}			
+			
+			/**
+			 * Called from the creationComplete event (see the root MXML tag)
+			 * 
+			 * This method sets up our ObjectHandles instance and adds a listener to our data model.
+			 **/
+			protected function init() : void
+			{
+				/*
+				  Since this is a View object, it should be watching the data model and updating itself
+				  when it changed.  This MXML file is tasked with creating or removing display objects when
+				  they're added or removed from the data model.  To do that, we'll create an event listener
+				  on dataModel.rectangles
+				*/
+				dataModel.shapes.addEventListener(CollectionEvent.COLLECTION_CHANGE, onShapesChanged );
+				
+				/*
+				  Create the ObjectHandles instance.  In terms of MVC, ObjectHandles is part of the Controller
+				  It will listen for events on the view, and make changes to the data model. 
+				*/
+				objectHandles = new ObjectHandles( mainCanvas );
+			}
+			
+			protected function onShapesChanged( event:CollectionEvent ) : void
+			{
+				switch( event.kind  )
+				{
+					case CollectionEventKind.ADD:	addShapes( event.items );
+													break;				
+					case CollectionEventKind.REMOVE: removeShapes(event.items);
+												     break;
+					default:				
+						/* For this simple application, we're only going to deal with adding and removing rectangles,
+						   later examples will get more involved. */
+				}
+			}
+			
+			/**
+			 * Removes rectangles from the display. 
+			 * 
+			 * This gets called when the model is changes and thigns are removed
+			 * from dataModel.rectangles.
+			 **/
+			protected function removeShapes( shapes:Array ) : void
+			{
+				
+				// Note, since ImageModel, and CircleModel descend from RectangleModel, we don't need
+				// to special case this loop.  Im a more complex application, you might want a base
+				// class or interface that explictly defines shapes on the screen.
+				
+				for each ( var rect:RectangleModel in shapes ) // the data models are passed in, so loop over them
+				{
+					// First, get the view object that corresponds to that data model
+					var viewObject:IEventDispatcher = objectHandles.getDisplayForModel( rect );
+					
+					// Unregister from ObjectHandles so it doesn't try to modify it anymore, this
+					// will also remove event listeners.
+					objectHandles.unregisterComponent( viewObject );
+					
+					// Finally, actually remove it from the view.
+					mainCanvas.removeChild( viewObject as DisplayObject );
+					
+				}
+			}
+			
+			
+			
+			/**
+			 * adds rectangles to the display. 
+			 * 
+			 * This gets called when the model is changes and thigns are added
+			 * to dataModel.rectangles.
+			 **/			
+			protected function addShapes( shapes:Array ) : void
+			{
+				for each ( var shape:Object in shapes )
+				{					
+					/*
+					  Step 6
+					  
+					  When we get here, we aren't always adding rectangles anymore.  So now we
+					  need to check the type of the shape variable and do different things based on that type.
+					*/					
+					
+					if( shape is ImageModel )
+					{
+						addImageView( shape as ImageModel );
+					}
+					else if(shape is CircleModel )
+					{
+						addCircleView( shape as CircleModel );
+					}
+					else if( shape is RectangleModel )
+					{
+						addRectangleView( shape as RectangleModel )
+					}										
+				}
+			}
+			
+			/* 
+			   Step 7
+			   Factor out the code to add a rectangle view into it's own method.
+			*/
+			protected function addRectangleView( rect:RectangleModel ) : void
+			{
+				var newView:RectangleView2 = new RectangleView2();
+				newView.dataModel = rect;
+				objectHandles.registerComponent( rect, newView );
+				mainCanvas.addChild( newView );
+			}
+			
+			/*
+			 Step 8
+			 Write an addCircleView method
+			 
+			 This method uses a new CircleView class that behaves much like RectangleView did, go take a look
+			 at CircleView.as to see it.
+			*/
+			protected function addCircleView( circle:CircleModel ) : void
+			{
+				var newView:CircleView = new CircleView(circle);		// This is a pure AS3 object instead of an MXML object and it's data model
+																		// is passed into it's constructor.  		
+				objectHandles.registerComponent( circle, newView );
+				mainCanvas.addChild( newView );	
+			}
+			
+			/*
+			 Step 9
+			 Write an addImageView method - just like addCircleView or addRectangleView
+			 
+			 This method uses a new ImageView class that can be found in ImageView.mxml, it's worth
+			 taking a look at to see how the image source gets applied to the image component within it.
+			 It's worth understanding how these views that we're adding could be complex MXML components.
+			 
+			 In a more complex app, we'd probably want to combine all of these with some sort of
+			 lookup table to determine which sort of view to create, but I'm tyring to 
+			 keep this example simple.
+			*/
+			protected function addImageView( image:ImageModel ) : void
+			{
+				var newView:ImageView = new ImageView();
+				newView.dataModel = image;
+				objectHandles.registerComponent( image, newView );
+				mainCanvas.addChild( newView );				
+			}			
+			
+		]]>
+	</mx:Script>
+	
+	
+	<mx:Canvas left="109" 
+			right="0" top="0" 
+			bottom="0" 
+			backgroundColor="#FFFFFF" 
+			id="mainCanvas"
+			dragEnter="onDragEnter(event)"
+			dragDrop="onDragDrop(event);"
+			/>
+		   
+	<!--
+	   Step 1
+	   
+	   Add three more places to drag shapes from on the left toolbar area.  We also add a parameter to the
+	   beginDrag method in step 2, so lets set that while we're here.
+	-->		   
+	<mx:Image source="rectangle.png" top="10" left="5" mouseDown="beginDrag(event,'rectangle')" id="rectangleSource" />
+	<mx:Image source="circle.png" top="40" left="5" mouseDown="beginDrag(event,'circle')" id="circleSource" />
+	<mx:Image source="car1.png" top="70" left="5" mouseDown="beginDrag(event,'car1')" id="car1Source" />
+	<mx:Image source="car2.png" top="100" left="5" mouseDown="beginDrag(event,'car2')" id="car2Source" />
+	
+	<mx:Button x="10" bottom="10" label="Del Square" width="91" click="deleteSquare()"/>
+	
+</mx:Application>

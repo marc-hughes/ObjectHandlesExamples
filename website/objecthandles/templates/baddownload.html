@@ -1,0 +1,15 @@
+{% extends "objecthandles/base.html" %}
+
+{% block content %}
+	
+	
+	<h1>Download Error</h1>
+
+	<div class="intro">
+	Hi, it looks like you tried to download the examples, but haven't donated yet.  If this is in error please email
+	marc@rogue-development.com and I'll figure out what went wrong.
+	<hr/>
+	<a href="{% url objecthandles.views.home %}"><img src="/static/donate.png" ></a>
+	</div>
+
+{% endblock %}

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+		borderStyle="none" 
+		width="{dataModel.width}" 
+		height="{dataModel.height}"
+		x="{dataModel.x}"
+		y="{dataModel.y}"
+		rotation="{dataModel.rotation}"
+		resize="onResize(event)"
+		horizontalScrollPolicy="off"
+		verticalScrollPolicy="off"
+		creationComplete="init()"
+		backgroundAlpha="0"
+		>
+		
+		<!--
+		   If you're going to scale, rotate, or play with the alpha channel of text in flex, you must embed the font.
+		   Here, we're embedding regular weight, non italic Arial and calling it "myFont"
+		-->
+	<mx:Style>
+		@font-face{
+			    font-family: "myFont";
+			    src: local("Arial");
+			    font-weight: regular;
+			    font-style: normal;  
+			}
+	</mx:Style>
+		
+	<mx:Script>
+		<![CDATA[
+			import mx.binding.utils.ChangeWatcher;
+			import mx.events.ResizeEvent;
+			
+			
+			[Bindable] public var dataModel:TextModel;
+			
+			protected function init() : void
+			{				
+				onResize(null); // resize our text on startup
+			}
+			
+			protected function onTextChanged():void
+			{
+				dataModel.text = textBlock.text;
+				onResize(null); // resize our text whenever the text changes.  When scaled, this makes the text smaller as you type.
+								// Instead of this, we could have adjusted the width/height of the component while the user typed so
+								// the bounding rectangle changed instead of the text.
+								
+			}
+			
+			/*
+			  When the component resizes, we need to resize the text differently depending on
+			  whether we're scaling the text or not.
+			*/
+			protected function onResize(event:ResizeEvent):void
+			{
+				if( dataModel.scaleText )
+				{
+					resizeScaledText();
+				}
+				else
+				{
+					resizeUnscaledText();
+				}				
+			}
+			
+			/*
+			  Here, we're grabbing the size of the text, and then scaling it to fill the component.
+			*/
+			protected function resizeScaledText() : void
+			{
+				textBlock.validateNow();
+				
+				var textWidth:Number = textBlock.textWidth + 30; // You need to give a textarea some padding so it doesn't try to internally scroll left to right.
+																 // 30 is an arbitrary number I picked after playing with it for a while to see what worked well.																 
+				var textHeight:Number = textBlock.textHeight;
+				
+				// Set the scaling of the text.
+				textBlock.scaleX = width / textWidth;
+				textBlock.scaleY = height / textHeight;
+				
+				// Then set the height/width				
+				textBlock.height = height;
+				textBlock.width = width;	
+			}
+			
+			/*
+			  Here, we're just resizing the text area so the text doesn't change size, just the
+			  available space for the text changes.
+			*/
+			protected function resizeUnscaledText() : void
+			{
+				textBlock.scaleX = 1;
+				textBlock.scaleY = 1;
+				textBlock.percentHeight=100;
+				textBlock.percentWidth=100;				
+			}
+			
+			
+			
+		]]>
+	</mx:Script>
+	
+	<mx:TextArea wordWrap="{! dataModel.scaleText}"  
+				 fontFamily="myFont" 
+				 fontSize="18"				 
+				 horizontalScrollPolicy="off"
+				 verticalScrollPolicy="off"				 
+				 color="{dataModel.backgroundColor}" 
+				 text="{dataModel.text}" 
+				 backgroundAlpha="0"
+				 id="textBlock" change="onTextChanged()"
+				 borderStyle="none"
+				 /> <!-- When we're scaling the text, dealing with multiple lines gives a bad user experience so we turn off word wrap then. -->
+	
+</mx:Canvas>

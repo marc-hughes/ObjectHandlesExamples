@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This shows how to create a view component in MXML.
+  
+  Note that we have a bindable dataModel property.  Then, through dataBinding we
+  set the x,y,width,height and rotation of this component to those values.
+  
+  This way, when the data model changes, the view will automatically reflect those
+  changes.
+
+-->
+
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		borderColor="#000000"
+		borderThickness="2"
+		backgroundColor="#eeeeee"
+		borderStyle="solid" 
+		width="{dataModel.width}" 
+		height="{dataModel.height}"
+		x="{dataModel.x}"
+		y="{dataModel.y}"
+		rotation="{dataModel.rotation}"
+		>
+	<mx:Script>
+		<![CDATA[
+			[Bindable] public var dataModel:RectangleModel;
+		]]>
+	</mx:Script>
+</mx:Canvas>

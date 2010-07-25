@@ -1,0 +1,15 @@
+*.zip
+*.air
+*.p12
+*bin-debug
+*bin-release
+*build_release_air
+*html-template
+*.hg
+*.svn
+*.DS_Store
+*.flv
+*.jar
+*.class
+*.LCK
+*.mov

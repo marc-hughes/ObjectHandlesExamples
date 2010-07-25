@@ -1,0 +1,55 @@
+/* @override http://localhost:8000/static/style.css */
+
+body {
+	font-size: 14px;
+}
+
+a img {
+	border: none;
+}
+
+.exampleGrid {
+	border-style: solid;
+}
+
+.exampleGrid tr td {
+	padding: 9px;
+}
+
+.exampleGridTr2 {
+	background-color: #e5e5e5;
+}
+.exampleGridTr1 {
+	width: 15%;
+	max-width: 100px;
+}
+
+.exampleGrid tr td:nth-of-type(2) {
+	width: 40%;
+	max-width: 150px;
+}
+
+.exampleGrid tr td:nth-of-type(3) {
+	width: 40%;
+
+}
+
+.exampleGridTrh {
+	background-color: #abe3ce;
+	font-size: 18px;
+}
+
+.intro {
+	max-width: 600px;
+	margin-left: 40px;
+}
+
+.topDonate {
+	float: right;
+}
+
+.donateMethod {
+	margin: 10px 30px 10px 10px;
+	padding: 10px;
+	background-color: #e0fcff;
+}

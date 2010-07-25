@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 		
+		width="{dataModel.width}" 
+		height="{dataModel.height}"
+		x="{dataModel.x}"
+		y="{dataModel.y}"
+		rotation="{dataModel.rotation}"
+		horizontalScrollPolicy="off"
+		verticalScrollPolicy="off"
+		>
+		
+	<mx:Script>
+		<![CDATA[
+			[Bindable] public var dataModel:ImageModel;
+		]]>
+	</mx:Script>
+	
+	<mx:Image maintainAspectRatio="false" 
+			  width="100%" height="100%" 
+			  source="{dataModel.imageSource}" />
+			  
+</mx:Canvas>
